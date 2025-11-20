@@ -11,6 +11,20 @@ public class Produto {
     public Produto(String nome,String codigo, BigDecimal precoUnitario) {
         //validação
 
+        Objects.requireNonNull(codigo, "O código não pode ser nulo");
+        Objects.requireNonNull(nome, "O nome não pode ser nulo");
+        Objects.requireNonNull(precoUnitario, "O preço não pode ser nulo");
+
+        if (codigo.trim().isEmpty()) {
+            throw new IllegalArgumentException("O código do produto não pode ser vazio.");
+        }
+        if (nome.trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome do produto não pode ser vazio.");
+        }
+        if (precoUnitario.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("O preço unitário deve ser maior que zero.");
+        }
+
 
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("nome do produto não pode ser vazio");
