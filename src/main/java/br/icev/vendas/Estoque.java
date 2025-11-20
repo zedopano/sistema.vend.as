@@ -3,40 +3,37 @@ package br.icev.vendas;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Estoque {
-    private final Map<Produto, Integer> estoque = new HashMap<>();
+import br.icev.vendas.excecoes.QuantidadeInvalidaException;
+import br.icev.vendas.excecoes.SemEstoqueException;
 
-    public void adicionarProduto(Produto produto, int quantidadeInicial) {
-        if (quantidadeInicial <= 0) {
-            throw new QuantidadeInvalidaException("A quantidade inicial deve ser positiva.");
+public class Estoque {
+    private final Map<String, Integer> estoque = new HashMap<>();
+
+    public void adicionarEstoque(String codigoProduto, int quantidadeInicial) {
+        if (quantidadeInicial < 0) {
+            throw new QuantidadeInvalidaException("A quantidade inicial deve ser maior que 0.");
         }
         if (produto == null) {
             throw new IllegalArgumentException("O produto não pode ser nulo.");
         }
-        estoque.put(produto, quantidadeInicial);
+        estoque.put(codigoProduto,estoque.getOrDefault(codigoProduto, 0) + quantidadeInicial);
+    }
+    public int getDisponivel(String codigoProduto) {
+        return estoque.getOrDefault(codigoProduto, 0);
     }
 
-
-    public void retirar(Produto produto, int quantidade) {
+    public void reservar(String codigoProduto, int quantidade) {
         if (quantidade <= 0) {
-            throw new QuantidadeInvalidaException("A quantidade a retirar deve ser positiva.");
+            throw new QuantidadeInvalidaException("A quantidade a reservar deve ser positiva.");
         }
 
-        Integer quantidadeAtual = estoque.getOrDefault(produto, 0);
+        int atual = getDisponivel(codigoProduto);
 
-        if (quantidadeAtual == 0) {
-            throw new SemEstoqueException("O produto " + produto.getNome() + " não está no estoque.");
+        if (atual < quantidade) {
+            // Mensagem simples e direta, compatível com String
+            throw new SemEstoqueException("Estoque insuficiente para o produto " + codigoProduto);
         }
 
-        if (quantidadeAtual < quantidade) {
-            throw new SemEstoqueException("Estoque insuficiente para " + produto.getNome() +
-                    ". Disponível: " + quantidadeAtual + ", Solicitado: " + quantidade);
-        }
-
-        estoque.put(produto, quantidadeAtual - quantidade);
-    }
-
-    public int getQuantidade(Produto produto) {
-        return estoque.getOrDefault(produto, 0);
+        estoque.put(codigoProduto, atual - quantidade);
     }
 }

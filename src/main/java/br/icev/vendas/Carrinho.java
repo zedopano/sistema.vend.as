@@ -19,4 +19,7 @@ public class Carrinho {
     public int getTotalItens() {
         throw new UnsupportedOperationException("TODO");
     }
+    public Map<Produto,Integer> getItens(){
+        return new HashMap<>(itens);
+    }
 }

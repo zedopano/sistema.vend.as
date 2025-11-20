@@ -5,6 +5,8 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import br.icev.vendas.excecoes.QuantidadeInvalidaException;
+
 
 public class UtilDinheiro {
 
@@ -20,7 +22,7 @@ public class UtilDinheiro {
             throw new QuantidadeInvalidaException("não tem como vender menos que 1 produto...");
         }
 
-        return precoUnitario.multiply(BigDecimal.valueOf(quantidade)).setScale(2,RoundingMode.HALF_UP);
+        return precoUnitario.multiply(BigDecimal.valueOf(quantidade)).setScale(2,RoundingMode.HALF_EVEN);
 
 
     }
