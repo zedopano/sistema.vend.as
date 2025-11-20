@@ -1,0 +1,75 @@
+# 🛒 Sistema de Vendas (Backend Core)
+
+> **Autores:** Yuri  e Ricardo
+> **Tecnologia:** Java ☕  
+> **Versão:** 1.0  
+
+---
+
+## 📘 1. Visão Geral
+Este projeto é o **núcleo (backend)** de um sistema de e-commerce robusto. Ele gerencia todo o fluxo de venda, desde o cadastro do produto até a baixa no estoque e pagamento.
+
+**O sistema garante:**
+* ✅ Cálculo financeiro com precisão bancária.
+* ✅ Integridade de estoque.
+* ✅ Regras de negócio validadas (Fail Fast).
+
+---
+
+## 🛠️ 2. Arquitetura e Decisões Técnicas
+
+### 💰 Dinheiro e Precisão (`BigDecimal`)
+Para evitar o famoso problema do *"centavo perdido"* em sistemas flutuantes (`double`), todo o sistema utiliza `java.math.BigDecimal`.
+* **Regra de Ouro:** Todas as operações usam `RoundingMode.HALF_EVEN` (Arredondamento Bancário).
+* **Resultado:** Consistência total entre o valor do carrinho e o valor cobrado no cartão.
+
+### 🆔 Identidade do Produto (SKU)
+No mundo real, nomes mudam, mas o código de barras não.
+* A igualdade (`equals`/`hashCode`) do objeto `Produto` ignora o nome e foca exclusivamente no **Código (SKU)**.
+* Isso evita duplicidade e erros de cadastro.
+
+### 📦 Gestão de Estoque Desacoplada
+O estoque não guarda o objeto `Produto`, mas sim o seu **Código** (`String`).
+* Isso permite movimentar o estoque através de IDs vindos de um front-end ou API, sem precisar instanciar o objeto completo.
+
+---
+
+## 📚 3. Dicionário de Classes
+
+### 🏷️ Entidades
+| Classe | Ícone | Descrição |
+| :--- | :---: | :--- |
+| **`Produto`** | 👕 | Item imutável. Possui nome, código e preço. Valida dados obrigatórios no construtor. |
+| **`Estoque`** | 🏭 | Controla a quantidade disponível via `Map<String, Integer>`. |
+| **`Carrinho`** | 🛒 | Guarda a intenção de compra. Delega cálculos para `UtilDinheiro`. |
+| **`Pedido`** | 📝 | O "recibo" final. É um objeto imutável gerado após o sucesso do pagamento. |
+
+### ⚙️ Utilitários e Interfaces
+| Classe | Ícone | Descrição |
+| :--- | :---: | :--- |
+| **`UtilDinheiro`** | 💸 | Calculadora central do sistema. Garante que `2 * 19.90` seja arredondado corretamente. |
+| **`PoliticaDesconto`** | 📉 | Interface (`Strategy Pattern`) para criar regras de promoção dinâmicas. |
+| **`GatewayPagamento`** | 💳 | Interface que simula a comunicação com operadoras de cartão. |
+
+---
+
+## 🚀 4. Fluxo de Execução (Exemplo)
+
+1.  **Cadastro:** O gerente cadastra uma *"Camiseta"* (SKU-01) por `R$ 29,90`.
+2.  **Estoque:** Adiciona-se **100 unidades** do SKU-01 no `Estoque`.
+3.  **Compra:** O cliente adiciona 2 camisetas no `Carrinho`.
+4.  **Cálculo:** O sistema calcula: `29.90 * 2 = 59.80` (usando `HALF_EVEN`).
+5.  **Reserva:** O sistema verifica se há 2 itens disponíveis e os **reserva** (baixa).
+6.  **Checkout:** O pagamento é processado e um `Pedido` é gerado.
+
+---
+
+## 🧪 5. Testes e Qualidade
+O sistema foi desenvolvido orientado a testes (TDD friendly).
+* 🟢 **Unitários:** Validam lógica de arredondamento e exceções.
+* 🛡️ **Exceções Tratadas:**
+    * `QuantidadeInvalidaException`: 🚫 Impede vender 0 ou negativo.
+    * `SemEstoqueException`: 🚫 Impede vender o que não tem.
+    * `IllegalArgumentException`: 🚫 Impede dados nulos.
+
+---
