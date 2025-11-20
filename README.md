@@ -1,6 +1,6 @@
 # 🛒 Sistema de Vendas (Backend Core)
 
-> **Autores:** Yuri  e Ricardo
+> **Autores:** Yuri  e Ricardo  (fizemos com a função code with me do intelijj)
 > **Tecnologia:** Java ☕  
 > **Versão:** 1.0  
 
